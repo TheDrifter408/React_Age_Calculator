@@ -1,12 +1,18 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
 import './App.css'
+import CounterAnimate from './components/CounterAnimate'
 
-
-
+//Error state type:
 type Result = {
   years: string,
   months:string,
   days:string
+}
+
+type Count = {
+  years:number,
+  months:number,
+  days:number
 }
 
 type Error = {
@@ -28,16 +34,17 @@ type Error = {
 }
 
 function App() {
+
   const [userInput, setUserInput] = useState<Result>({
     years:'--',
     months:'--',
     days:'--'
   })
 
-  const [result,setResult] = useState<Result>({
-    years:'--',
-    months:'--',
-    days:'--'
+  const [result,setResult] = useState<Count>({
+    years:0,
+    months:0,
+    days:0
   })
 
   const [error,setError] = useState<Error>({
@@ -62,7 +69,6 @@ function App() {
 
     const warningText = 'This field is required'
     const warningColor = 'text-red-500'
-    console.log(days,months,years)
     //checking user day input 
     if(days.length === 0){
         setError({...error, days:{state:true,color:warningColor,text: warningText}})
@@ -75,7 +81,7 @@ function App() {
     } else {
         const userDate = new Date(Number(years),Number(months) - 1,Number(days));
         const today = new Date();
-        if( userDate.getDate() !== Number(days) ){
+        if(userDate.getDate() !== Number(days)){
           setError({...error, days:{state:true,color:warningColor,text:'Must be a valid Date.'}})
         } 
         else if((userDate.getMonth()) !== (Number(months) - 1)){
@@ -116,7 +122,8 @@ function App() {
       age_month = 11
       age_year--;
     }
-    return {years:String(age_year),months:String(age_month),days:String(age_days)}
+    age_month++;
+    return {years:age_year,months:age_month,days:age_days}
   }
 
   function handleChange(e:ChangeEvent<HTMLInputElement>) {
@@ -133,17 +140,18 @@ function App() {
 
     const ErrStat:boolean = validateDate(days,months,years)
 
-    if(ErrStat === true){
-      console.log("Error occured");
+    if(ErrStat === false){
+      console.log("Validation not passed.");
+      return;
     } else {
-      const newResult = Counter(days,months,years);
-      setResult({...result,...newResult})
+      const tempResult = Counter(days,months,years);
+      setResult({...tempResult})
     }
 
   }
   return (
-    <section className="bg-gray-100 min-h-screen grid place-content-center">
-      <div className="border-2 bg-white border-black rounded-t-[1rem] rounded-bl-[1rem] rounded-br-[8rem] m-auto w-[100%] grid py-4 px-10">
+    <section className="grid place-content-center min-h-screen">
+      <div className="border-2 bg-white border-black rounded-t-[1rem] rounded-bl-[1rem] rounded-br-[8rem] m-auto w-[100%] grid py-4 px-5">
         <form onSubmit={handleSubmit} className="m-0 p-0">
           <div className="flex gap-1 justify-center ">
             <div className="flex flex-col p-[0.5rem] m-0 w-3/4">
@@ -163,14 +171,14 @@ function App() {
             </div>
           </div>
           <div className="flex gap-2 items-center my-1">
-          <div className="w-3/4 h-[2px] bg-slate-200 p-0 m-0" />
-          <button className="h-[50px] w-[50px] rounded-full text-slate-100 bg-purple-700 m-0" type="submit"> S </button>
+          <div className="w-[85%] h-[2px] bg-slate-200 p-0 m-0" />
+          <button className="h-[50px] w-[50px] rounded-full text-slate-100 bg-purple-700 m-0 p-[0.05rem] text-sm" type="submit"> Submit </button>
           </div>
         </form>
         <div className="">
-          <h2 className="font-bold italic text-7xl my-1 mx-0"><span className="text-purple-700">{result.years}</span> years</h2>
-          <h2 className="font-bold italic text-7xl my-1 mx-0"><span className="text-purple-700">{result.months}</span> months</h2>
-          <h2 className="font-bold italic text-7xl my-1"><span className="text-purple-700">{result.days}</span> days</h2>
+          <CounterAnimate text={"years"} initialValue={0} targetValue={result.years} />
+          <CounterAnimate text={"months"} initialValue={0} targetValue={result.months} />
+          <CounterAnimate text={"days"} initialValue={0} targetValue={result.days} />
         </div>
       </div>  
     </section>
